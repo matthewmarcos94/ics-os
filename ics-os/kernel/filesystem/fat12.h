@@ -1,12 +1,12 @@
 /*
   Name: FAT filesystem driver
-  Copyright: 
+  Copyright:
   Author: Joseph Emmanuel DL Dayo
   Date: 13/03/04 06:30
   Description: This is the implementation of the FAT filesystem based on the
   "Microsoft Extensible Firmware Initiative FAT32 File System Specification"
   version 1.03 released by Microsoft Corporation on December 6,2000
-  
+
     DEX educational extensible operating system 1.0 Beta
     Copyright (C) 2004  Joseph Emmanuel DL Dayo
 
@@ -22,7 +22,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef FAT_H
@@ -115,7 +115,7 @@ typedef struct __attribute__((packed)) fat_bootsector			/* Warning: this struct 
 	WORD heads;
 	DWORD hidden_sectors;	/* =LBA partition start */
 	DWORD total_sectors_large;	/* 32-bit; 0 if num sectors < 65536 */
-	
+
 	/*********************FAT12/16 only portion******************************/
 	BYTE drvnum;
 	BYTE reserved1;
@@ -143,7 +143,7 @@ typedef struct __attribute__((packed)) fat_bootsector32			/* Warning: this struc
 	WORD heads;
 	DWORD hidden_sectors;	/* =LBA partition start */
 	DWORD total_sectors_large;	/* 32-bit; 0 if num sectors < 65536 */
-	
+
 	/*********************FAT12/16 only portion******************************/
 	DWORD fatsz32;
 	WORD  extflags;

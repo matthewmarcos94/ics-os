@@ -479,11 +479,10 @@ void console_ls(int style, int sortmethod){
 void save_history(const char *str){
 
     // vfs_core.c
-    char filename[7] = "history";
-    file_PCB *history_file = openfilex(filename, FILE_APPEND);
+    char file_name[18] = "/icsos/history.txt";
 
-    fwrite(str, strlen(str), 1, history_file);
-
+    file_PCB *history_file = openfilex(file_name, FILE_APPEND);
+    fwrite(str, 1, sizeof(file_name), history_file);
     fclose(history_file);
 
 }
@@ -513,7 +512,7 @@ int console_execute(const char *str){
     signed char mouse_x, mouse_y, last_mouse_x = 0, last_mouse_y = 0;
 
     // Call function to save history to file
-    // save_history(str);
+    save_history(str);
 
     //make a copy so that strtok wouldn't ruin str
     strcpy(temp, str);
