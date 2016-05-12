@@ -476,27 +476,38 @@ void console_ls(int style, int sortmethod){
 
 }
 
-void save_history(const char *str){
+/*
+    void save_history
+    @params: char str[]
+        = contains the input to the console
+*/
+void save_history(const char str[]){
 
     // vfs_core.c
-    char file_name[18] = "/icsos/history.txt";
+    char file_name[18];
+    char temp_string[500];
+
+    // File name
+    strcpy(file_name, "/icsos/history.txt");
+    // copy str to temp_string to
+    // avoid mutating data.
+    strcpy(temp_string, str);
+    strcat(temp_string, '\t');
 
     file_PCB *history_file = openfilex(file_name, FILE_APPEND);
-    fwrite(str, 1, sizeof(file_name), history_file);
+    // file_PCB *history_file = fopen(file_name, FILE_APPEND);
+    fwrite(str, (int)sizeof(char), strlen(temp_string), history_file);
     fclose(history_file);
 
 }
 
-char** view_history() {
-    char **f;
-    char filename[7] = "history";
-    char command;
-    file_PCB *history_file = openfilex(filename, FILE_READ);
-
-
+void view_history() {
+    // vfs_core.c
+    char file_name[18];
+    // File name
+    strcpy(file_name, "/icsos/history.txt");
+    file_PCB *history_file = openfilex(file_name, FILE_APPEND);
     fclose(history_file);
-
-    return f;
 }
 
 /* ==================================================================
