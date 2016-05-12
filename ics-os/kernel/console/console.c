@@ -477,13 +477,26 @@ void console_ls(int style, int sortmethod){
 }
 
 void save_history(const char *str){
-    FILE *f;
-    
-    f = fopen("history.hs", "a");
 
-    fprintf(f, "%s", str);
+    // vfs_core.c
+    char file_name[18] = "/icsos/history.txt";
 
-    fclose(f);
+    file_PCB *history_file = openfilex(file_name, FILE_APPEND);
+    fwrite(str, 1, sizeof(file_name), history_file);
+    fclose(history_file);
+
+}
+
+char** view_history() {
+    char **f;
+    char filename[7] = "history";
+    char command;
+    file_PCB *history_file = openfilex(filename, FILE_READ);
+
+
+    fclose(history_file);
+
+    return f;
 }
 
 /* ==================================================================
@@ -498,7 +511,9 @@ int console_execute(const char *str){
     int command_length = 0;
     signed char mouse_x, mouse_y, last_mouse_x = 0, last_mouse_y = 0;
 
+    // Call function to save history to file
     save_history(str);
+
     //make a copy so that strtok wouldn't ruin str
     strcpy(temp, str);
     u = strtok(temp, " ");
@@ -812,6 +827,10 @@ int console_execute(const char *str){
     }
     else if(strcmp(u, "demo_graphics") == 0) {
         demo_graphics();
+    }
+    else if(!strcmp(u, "clear")) {
+        int i;
+        clrscr();
     }
     else if(u[0] == '$') {
         int i, devid;
