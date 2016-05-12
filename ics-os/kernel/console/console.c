@@ -34,6 +34,7 @@ void getstring(char *buf, DEX32_DDL_INFO *dev){
     char c;
     do {
         c = getch();
+        //
         if(c == '\r' || c == '\n' || c == 0xa) break;
         if(c == '\b' || (unsigned char)c == 145) {
             if(i > 0) {
@@ -522,9 +523,6 @@ int console_execute(const char *str){
     int command_length = 0;
     signed char mouse_x, mouse_y, last_mouse_x = 0, last_mouse_y = 0;
 
-    // Call function to save history to file
-    save_history(str);
-
     //make a copy so that strtok wouldn't ruin str
     strcpy(temp, str);
     u = strtok(temp, " ");
@@ -914,6 +912,7 @@ void console_main(){
     if(console_first == 0) script_load("/icsos/autoexec.bat");
 
     console_first++;
+    // Main console loop
     do {
         textcolor(WHITE);
         textbackground(BLACK);
@@ -935,7 +934,10 @@ void console_main(){
             sendtokeyb(last, &_q);
             sendtokeyb("\r", &_q);
         }
-        else
+        else {
+            // Call function to save history to file
+            save_history(s);
             console_execute(s);
+        }
     } while(1);
 }
