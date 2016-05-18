@@ -27,16 +27,62 @@
 
 #include "console.h"
 
+typedef struct NODE{
+    char string[256];
+    struct NODE * next;
+    struct NODE * prev;
+}node;
+
 /*A console mode get string function terminates
    upon receving \r */
 void getstring(char *buf, DEX32_DDL_INFO *dev){
     unsigned int i = 0;
     char c;
+
     do {
         c = getch();
         //
         if(c == '\r' || c == '\n' || c == 0xa) break;
-        if(c == '\b' || (unsigned char)c == 145) {
+        if((unsigned char)c == 328 || (unsigned char)c == KEY_UP) {
+
+            char last_command[226];
+
+            // Assign the last inputted command to last_command
+            // somewhere here. Siguro galing sa linked list
+            strcpy(last_command, "echo \"last command\"");
+
+            if(i > 0) {
+                int tempX;
+                int tempI = i;
+                while(i > 0 && i--) {
+                    if(Dex32GetX(dev) == 0) {
+                        Dex32SetX(dev, 79);
+                        if(Dex32GetY(dev) > 0) {
+                            Dex32SetY(dev, Dex32GetY(dev)-1);
+                        }
+                    }
+                    else {
+                        Dex32SetX(dev, Dex32GetX(dev)-1);
+                    }
+
+                    Dex32PutChar(dev, Dex32GetX(dev), Dex32GetY(dev), ' ', Dex32GetAttb(dev));
+                }
+            }
+
+            int tempX;
+            for(tempX = 0 ; tempX < strlen(last_command) && tempX < 256 ; tempX++) {
+                Dex32PutChar(dev, Dex32GetX(dev), Dex32GetY(dev), buf[i] = last_command[i], Dex32GetAttb(dev));
+                i++;
+                Dex32SetX(dev, Dex32GetX(dev)+1);
+                if(Dex32GetX(dev) > 79) {
+                    Dex32SetX(dev, 0);
+                    Dex32NextLn(dev);
+                }
+            }
+
+
+        }
+        else if(c == '\b' || (unsigned char)c == 145) {
             if(i > 0) {
                 i--;
 
@@ -538,6 +584,34 @@ void load_history(){
 	fclose(history_file);
 }
 
+ void load_history(){
+	int i = 0;
+	const char dlim[3] = "\t";
+	char file_name[18];
+	char temp_string[1000];
+	char *token;
+ 	node *head = NULL;
+ 	node *p = NULL;
+ 	head = malloc(sizeof(NODE));
+ 	p = head;
+	strcpy(file_name, "/icsos/history.txt");
+    file_PCB *history_file = openfilex(file_name, FILE_APPEND);
+    fgets(temp_string, 1000, history_file)
+
+    token = strtok(temp_string, dlim);
+	while(token){
+		if(head == NULL){
+			head->string = temp_string;
+		}else{
+			p->next = malloc(sizeof(NODE));	//still at head
+			p = p->next;
+			p->string = temp_string;
+		}
+		token = (NULL, dlim)
+	}
+	fclose(history_file);
+}
+
 int console_execute(const char *str){
     char temp[512];
     char *u;
@@ -927,7 +1001,7 @@ void console_main(){
 
 
     clrscr();
-
+    load_history();
 
 
     strcpy(last, "");
@@ -952,6 +1026,7 @@ void console_main(){
 
         getstring(s, myddl);
 
+<<<<<<< HEAD
         if (!kb_dohotkey(c,kbd_status)) {     
            if(c == KEY_UP+400){
            	
@@ -961,7 +1036,11 @@ void console_main(){
       	}
 
         if(strcmp(s, "!") == 0)
+=======
+        if(strcmp(s, "!") == 0) {
+>>>>>>> UpArrow
             sendtokeyb(last, &_q);
+        }
         else if(strcmp(s, "!!") == 0) {
             sendtokeyb(last, &_q);
             sendtokeyb("\r", &_q);
