@@ -909,7 +909,7 @@ int console_new(){
 void console_main(){
     DEX32_DDL_INFO *myddl = 0;
     fg_processinfo *myfg;
-    unsigned int c;
+    unsigned int arwkey;
     char s[256] = "";
     char temp[256] = "";
     char last[256] = "";
@@ -951,15 +951,20 @@ void console_main(){
             strcpy(last, s);
 
         getstring(s, myddl);
-        c = (int)s;
+
+        if (!kb_dohotkey(c,kbd_status)) {     
+           if(c == KEY_UP+400){
+           	
+           }else if(c == KEY_DOWN+400){
+
+           }
+      	}
 
         if(strcmp(s, "!") == 0)
             sendtokeyb(last, &_q);
         else if(strcmp(s, "!!") == 0) {
             sendtokeyb(last, &_q);
             sendtokeyb("\r", &_q);
-        }else if(c == KEY_UP){
-
         }
         else {
             // Call function to save history to file
