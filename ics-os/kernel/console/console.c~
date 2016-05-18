@@ -493,7 +493,7 @@ void save_history(const char str[]){
     // copy str to temp_string to
     // avoid mutating data.
     strcpy(temp_string, str);
-    strcat(temp_string, "\n");
+    strcat(temp_string, '\t');
 
     file_PCB *history_file = openfilex(file_name, FILE_APPEND);
     // file_PCB *history_file = fopen(file_name, FILE_APPEND);
@@ -516,27 +516,6 @@ void view_history() {
  * This command is used to execute a console string.
 
  */
- 
-void load_history(){
-	int i = 0;
-	char file_name[18];
-	char temp_string[500];
-
-	strcpy(file_name, "/icsos/history.txt");
-    file_PCB *history_file = openfilex(file_name, FILE_APPEND);
-
-	while(1){
-		fgets(temp_string, 500, history_file);
-		if(feof(history_file)){ 
-			break;
-		}else{
-			printf("%i %s", i, temp_string);
-		}
-		i++;
-	}
-
-	fclose(history_file);
-}
 
 int console_execute(const char *str){
     char temp[512];
@@ -861,8 +840,6 @@ int console_execute(const char *str){
     else if(!strcmp(u, "clear")) {
         int i;
         clrscr();
-    }else if(!strcmp(u, "history")) {
-        load_history();
     }
     else if(u[0] == '$') {
         int i, devid;
@@ -909,7 +886,6 @@ int console_new(){
 void console_main(){
     DEX32_DDL_INFO *myddl = 0;
     fg_processinfo *myfg;
-    unsigned int c;
     char s[256] = "";
     char temp[256] = "";
     char last[256] = "";
@@ -951,15 +927,12 @@ void console_main(){
             strcpy(last, s);
 
         getstring(s, myddl);
-        c = (int)s;
 
         if(strcmp(s, "!") == 0)
             sendtokeyb(last, &_q);
         else if(strcmp(s, "!!") == 0) {
             sendtokeyb(last, &_q);
             sendtokeyb("\r", &_q);
-        }else if(c == KEY_UP){
-
         }
         else {
             // Call function to save history to file
