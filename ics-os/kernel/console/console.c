@@ -32,11 +32,51 @@
 void getstring(char *buf, DEX32_DDL_INFO *dev){
     unsigned int i = 0;
     char c;
+
     do {
         c = getch();
         //
         if(c == '\r' || c == '\n' || c == 0xa) break;
-        if(c == '\b' || (unsigned char)c == 145) {
+        if((unsigned char)c == 328 || (unsigned char)c == KEY_UP) {
+
+            char last_command[226];
+
+            // Assign the last inputted command to last_command
+            // somewhere here. Siguro galing sa linked list
+            strcpy(last_command, "echo \"last command\"");
+
+            if(i > 0) {
+                int tempX;
+                int tempI = i;
+                while(i > 0 && i--) {
+                    if(Dex32GetX(dev) == 0) {
+                        Dex32SetX(dev, 79);
+                        if(Dex32GetY(dev) > 0) {
+                            Dex32SetY(dev, Dex32GetY(dev)-1);
+                        }
+                    }
+                    else {
+                        Dex32SetX(dev, Dex32GetX(dev)-1);
+                    }
+
+                    Dex32PutChar(dev, Dex32GetX(dev), Dex32GetY(dev), ' ', Dex32GetAttb(dev));
+                }
+            }
+
+            int tempX;
+            for(tempX = 0 ; tempX < strlen(last_command) && tempX < 256 ; tempX++) {
+                Dex32PutChar(dev, Dex32GetX(dev), Dex32GetY(dev), buf[i] = last_command[i], Dex32GetAttb(dev));
+                i++;
+                Dex32SetX(dev, Dex32GetX(dev)+1);
+                if(Dex32GetX(dev) > 79) {
+                    Dex32SetX(dev, 0);
+                    Dex32NextLn(dev);
+                }
+            }
+
+
+        }
+        else if(c == '\b' || (unsigned char)c == 145) {
             if(i > 0) {
                 i--;
 
@@ -928,8 +968,9 @@ void console_main(){
 
         getstring(s, myddl);
 
-        if(strcmp(s, "!") == 0)
+        if(strcmp(s, "!") == 0) {
             sendtokeyb(last, &_q);
+        }
         else if(strcmp(s, "!!") == 0) {
             sendtokeyb(last, &_q);
             sendtokeyb("\r", &_q);
