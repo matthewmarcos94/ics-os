@@ -27,6 +27,12 @@
 
 #include "console.h"
 
+typedef struct NODE{
+    char string[256];
+    struct NODE * next;
+    struct NODE * prev;
+}node;
+
 /*A console mode get string function terminates
    upon receving \r */
 void getstring(char *buf, DEX32_DDL_INFO *dev){
@@ -557,6 +563,31 @@ void view_history() {
 
  */
 
+ void load_history(){
+	int i = 0;
+	const char dlim[3] = "\t";
+	char file_name[18];
+	char temp_string[1000];
+	char *token;
+ 	node *head = NULL;
+ 	head = malloc(sizeof(NODE));
+
+	strcpy(file_name, "/icsos/history.txt");
+    file_PCB *history_file = openfilex(file_name, FILE_APPEND);
+    fgets(temp_string, 1000, history_file)
+
+    token = strtok(temp_string, dlim);
+	while(token){
+		if(head == NULL){
+			head->string = temp_string;
+		}else{
+			head->next = malloc(sizeof(NODE));
+		}
+		token = (NULL, dlim)
+	}
+	fclose(history_file);
+}
+
 int console_execute(const char *str){
     char temp[512];
     char *u;
@@ -943,7 +974,7 @@ void console_main(){
 
 
     clrscr();
-
+    load_history();
 
 
     strcpy(last, "");
