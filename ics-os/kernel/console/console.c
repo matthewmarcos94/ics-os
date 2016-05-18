@@ -1026,19 +1026,8 @@ void console_main(){
 
         getstring(s, myddl);
 
-<<<<<<< HEAD
-        if (!kb_dohotkey(c,kbd_status)) {     
-           if(c == KEY_UP+400){
-           	
-           }else if(c == KEY_DOWN+400){
-
-           }
-      	}
-
         if(strcmp(s, "!") == 0)
-=======
         if(strcmp(s, "!") == 0) {
->>>>>>> UpArrow
             sendtokeyb(last, &_q);
         }
         else if(strcmp(s, "!!") == 0) {
