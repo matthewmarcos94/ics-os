@@ -1,4 +1,4 @@
-/*
+ /*
    ==========================================================================
    Console.c
    Author: Joseph Emmanuel Dayo
@@ -27,16 +27,71 @@
 
 #include "console.h"
 
+typedef struct NODE{
+    char string[256];
+    struct NODE * next;
+    struct NODE * prev;
+}node;
+
+node *head = NULL;
+node *tail = NULL;
+node *curr = NULL;
+
 /*A console mode get string function terminates
    upon receving \r */
 void getstring(char *buf, DEX32_DDL_INFO *dev){
     unsigned int i = 0;
     char c;
+    node *p;
+    p = head;
+
     do {
         c = getch();
+        printf(" nhbyhbb %s", c);
         //
         if(c == '\r' || c == '\n' || c == 0xa) break;
-        if(c == '\b' || (unsigned char)c == 145) {
+        if((unsigned char)c == 328 || (unsigned char)c == KEY_UP) {
+
+            char last_command[256];
+
+            if(p->next == NULL){
+                continue;
+            }else{
+                p = p->next;
+                strcpy(last_command, p->string);
+            }
+
+            if(i > 0) {
+                int tempX;
+                int tempI = i;
+                while(i > 0 && i--) {
+                    if(Dex32GetX(dev) == 0) {
+                        Dex32SetX(dev, 79);
+                        if(Dex32GetY(dev) > 0) {
+                            Dex32SetY(dev, Dex32GetY(dev)-1);
+                        }
+                    }
+                    else {
+                        Dex32SetX(dev, Dex32GetX(dev)-1);
+                    }
+
+                    Dex32PutChar(dev, Dex32GetX(dev), Dex32GetY(dev), ' ', Dex32GetAttb(dev));
+                }
+            }
+
+            int tempX;
+            for(tempX = 0 ; tempX < strlen(last_command) && tempX < 256 ; tempX++) {
+                Dex32PutChar(dev, Dex32GetX(dev), Dex32GetY(dev), buf[i] = last_command[i], Dex32GetAttb(dev));
+                i++;
+                Dex32SetX(dev, Dex32GetX(dev)+1);
+                if(Dex32GetX(dev) > 79) {
+                    Dex32SetX(dev, 0);
+                    Dex32NextLn(dev);
+                }
+            }
+
+        }else if(c == '\b' || (unsigned char)c == 145) {
+            p = head;
             if(i > 0) {
                 i--;
 
@@ -50,7 +105,7 @@ void getstring(char *buf, DEX32_DDL_INFO *dev){
             }
         }
         else {
-
+            p = head;
             if(i < 256) { //maximum command line is only 255 characters
                 Dex32PutChar(dev, Dex32GetX(dev), Dex32GetY(dev), buf[i] = c, Dex32GetAttb(dev));
                 i++;
@@ -493,11 +548,12 @@ void save_history(const char str[]){
     // copy str to temp_string to
     // avoid mutating data.
     strcpy(temp_string, str);
-    strcat(temp_string, '\t');
+
 
     file_PCB *history_file = openfilex(file_name, FILE_APPEND);
     // file_PCB *history_file = fopen(file_name, FILE_APPEND);
     fwrite(str, (int)sizeof(char), strlen(temp_string), history_file);
+    fwrite("\n", sizeof(char), 1, history_file);
     fclose(history_file);
 
 }
@@ -510,6 +566,39 @@ void view_history() {
     file_PCB *history_file = openfilex(file_name, FILE_APPEND);
     fclose(history_file);
 }
+
+void load_history(){
+    int i = 0;
+    const char dlim[3] = "\n";
+    char file_name[18];
+    char temp_string[1000];
+    char *token;
+    //node *head = NULL;
+    head = malloc(sizeof(node));
+    strcpy(file_name, "/icsos/history.txt");
+    file_PCB *history_file = openfilex(file_name, FILE_APPEND);
+    fread(temp_string, 1000, 1, history_file);
+
+    token = strtok(temp_string, dlim);
+    while(token != NULL){
+        printf("%s", token);
+        if(head == NULL){
+            strcpy(head->string, token);
+            tail = curr = head;
+            head->prev = NULL;
+        }else{
+            tail->next = malloc(sizeof(node)); //still at head
+            tail->next->prev = tail;          
+            tail = tail->next;
+            tail->next = NULL;
+            curr = tail;
+            strcpy(tail->string, token);       
+        }
+        token = strtok(NULL, dlim);
+    }
+    fclose(history_file);
+    return head;
+} 
 
 /* ==================================================================
    console_execute(const char *str):
@@ -891,6 +980,7 @@ void console_main(){
     char last[256] = "";
     char console_fmt[256] = "%cdir% %% ";
     char console_prompt[256] = "cmd >";
+    node *p;
 
     DWORD ptr;
 
@@ -903,8 +993,9 @@ void console_main(){
 
 
     clrscr();
-
-
+   	head = (node *)malloc(sizeof(node));
+   	head->next = NULL;
+	head->prev = NULL;
 
     strcpy(last, "");
 
@@ -928,13 +1019,28 @@ void console_main(){
 
         getstring(s, myddl);
 
-        if(strcmp(s, "!") == 0)
+        if(strcmp(s, "!") == 0) {
             sendtokeyb(last, &_q);
+        }
         else if(strcmp(s, "!!") == 0) {
             sendtokeyb(last, &_q);
             sendtokeyb("\r", &_q);
         }
         else {
+        	p = (node *)malloc(sizeof(node));
+            p->next = NULL;
+            p->prev = NULL;
+
+        	if(head->next == NULL){
+        		head->next = p;
+        	}else{
+        		p->next = head->next;
+                head->next->prev = p;
+        		head->next = p;
+        	}
+			strcpy(p->string, s);
+
+
             // Call function to save history to file
             save_history(s);
             console_execute(s);
