@@ -52,6 +52,7 @@ void prompt_parser(const char *promptstr,char *prompt);
 int console_ls_sortsize(vfs_node *n1,vfs_node *n2);
 int console_ls_sortname(vfs_node *n1,vfs_node *n2);
 void console_ls(int style, int sortmethod);
+void load_history();
 int console_execute(const char *str);
 int console_new();
 void console_main();

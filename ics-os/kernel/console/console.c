@@ -47,7 +47,6 @@ void getstring(char *buf, DEX32_DDL_INFO *dev){
 
     do {
         c = getch();
-        printf(" nhbyhbb %s", c);
         //
         if(c == '\r' || c == '\n' || c == 0xa) break;
         if((unsigned char)c == 328 || (unsigned char)c == KEY_UP) {
@@ -58,6 +57,45 @@ void getstring(char *buf, DEX32_DDL_INFO *dev){
                 continue;
             }else{
                 p = p->next;
+                strcpy(last_command, p->string);
+            }
+
+            if(i > 0) {
+                int tempX;
+                int tempI = i;
+                while(i > 0 && i--) {
+                    if(Dex32GetX(dev) == 0) {
+                        Dex32SetX(dev, 79);
+                        if(Dex32GetY(dev) > 0) {
+                            Dex32SetY(dev, Dex32GetY(dev)-1);
+                        }
+                    }
+                    else {
+                        Dex32SetX(dev, Dex32GetX(dev)-1);
+                    }
+
+                    Dex32PutChar(dev, Dex32GetX(dev), Dex32GetY(dev), ' ', Dex32GetAttb(dev));
+                }
+            }
+
+            int tempX;
+            for(tempX = 0 ; tempX < strlen(last_command) && tempX < 256 ; tempX++) {
+                Dex32PutChar(dev, Dex32GetX(dev), Dex32GetY(dev), buf[i] = last_command[i], Dex32GetAttb(dev));
+                i++;
+                Dex32SetX(dev, Dex32GetX(dev)+1);
+                if(Dex32GetX(dev) > 79) {
+                    Dex32SetX(dev, 0);
+                    Dex32NextLn(dev);
+                }
+            }
+
+        }else if((unsigned char)c == 336 || (unsigned char)c == KEY_DN) {
+            char last_command[256];
+
+            if(p->prev == NULL){
+                continue;
+            }else{
+                p = p->prev;
                 strcpy(last_command, p->string);
             }
 
@@ -571,33 +609,18 @@ void load_history(){
     int i = 0;
     const char dlim[3] = "\n";
     char file_name[18];
-    char temp_string[1000];
+    char temp_string[256];
     char *token;
-    //node *head = NULL;
-    head = malloc(sizeof(node));
+
     strcpy(file_name, "/icsos/history.txt");
     file_PCB *history_file = openfilex(file_name, FILE_APPEND);
-    fread(temp_string, 1000, 1, history_file);
 
     token = strtok(temp_string, dlim);
     while(token != NULL){
         printf("%s", token);
-        if(head == NULL){
-            strcpy(head->string, token);
-            tail = curr = head;
-            head->prev = NULL;
-        }else{
-            tail->next = malloc(sizeof(node)); //still at head
-            tail->next->prev = tail;          
-            tail = tail->next;
-            tail->next = NULL;
-            curr = tail;
-            strcpy(tail->string, token);       
-        }
         token = strtok(NULL, dlim);
     }
     fclose(history_file);
-    return head;
 } 
 
 /* ==================================================================
@@ -929,6 +952,9 @@ int console_execute(const char *str){
     else if(!strcmp(u, "clear")) {
         int i;
         clrscr();
+    }
+    else if(!strcmp(u, "history")) {
+        load_history();
     }
     else if(u[0] == '$') {
         int i, devid;
