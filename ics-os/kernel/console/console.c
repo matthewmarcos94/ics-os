@@ -611,9 +611,9 @@ void load_history(){
     char file_name[18];
     char temp_string[256];
     char *token;
-
+    
     strcpy(file_name, "/icsos/history.txt");
-    file_PCB *history_file = openfilex(file_name, FILE_APPEND);
+    file_PCB *history_file = openfilex(file_name, FILE_READ);
 
     token = strtok(temp_string, dlim);
     while(token != NULL){
@@ -621,6 +621,7 @@ void load_history(){
         token = strtok(NULL, dlim);
     }
     fclose(history_file);
+
 } 
 
 /* ==================================================================
@@ -949,12 +950,12 @@ int console_execute(const char *str){
     else if(strcmp(u, "demo_graphics") == 0) {
         demo_graphics();
     }
+    else if(!strcmp(u, "history")){
+		load_history();
+    }
     else if(!strcmp(u, "clear")) {
         int i;
         clrscr();
-    }
-    else if(!strcmp(u, "history")) {
-        load_history();
     }
     else if(u[0] == '$') {
         int i, devid;
