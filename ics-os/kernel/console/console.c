@@ -611,13 +611,23 @@ void load_history(){
     char file_name[18];
     char temp_string[256];
     char *token;
+    node *p;
+    p = head; 
+
+    while(p->next != NULL){
+    	p = p->next;
+    }
+    
+    while(p->next->prev != NULL){
+        printf("%s\n", p->string);
+        p = p->prev;
+    }
     
     strcpy(file_name, "/icsos/history.txt");
     file_PCB *history_file = openfilex(file_name, FILE_READ);
 
     token = strtok(temp_string, dlim);
     while(token != NULL){
-        printf("%s", token);
         token = strtok(NULL, dlim);
     }
     fclose(history_file);
@@ -956,6 +966,7 @@ int console_execute(const char *str){
     else if(!strcmp(u, "clear")) {
         int i;
         clrscr();
+        load_history();
     }
     else if(u[0] == '$') {
         int i, devid;
